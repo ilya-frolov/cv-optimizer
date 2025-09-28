@@ -17,11 +17,11 @@ Follow these steps to set up and run the project:
    Download and install [Visual Studio Code](https://code.visualstudio.com/).
 
 3. **Open a New Folder**  
-   In VSC, go to File → Open Folder.
+   In VSC, go to File → Open Folder. 
    Choose or create a new folder (e.g., cv-optimizer).
 
 4. **Validate Python installed**  
-   Open the terminal in VSC (Terminal → New Terminal).
+   Open the terminal in VSC (Terminal → New Terminal). 
    Run the following command to confirm Python is installed:
       ```bash
       python --version
