@@ -17,31 +17,31 @@ Follow these steps to set up and run the project:
    Download and install [Visual Studio Code](https://code.visualstudio.com/).
 
 3. **Open a New Folder**
-    In VSC, go to File → Open Folder.
-    Choose or create a new folder (e.g., cv-optimizer).
+   In VSC, go to File → Open Folder.
+   Choose or create a new folder (e.g., cv-optimizer).
 
 4. **Validate Python installed**
-    Open the terminal in VSC (Terminal → New Terminal).
-    Run the following command to confirm Python is installed:
-        ```bash
-        python --version
-        ```
+   Open the terminal in VSC (Terminal → New Terminal).
+   Run the following command to confirm Python is installed:
+      ```bash
+      python --version
+      ```
 ---
 
 ### **Installation Steps**
 
 1. **Set up Python Environment**    
-    - Create a Python environment by running:        
-            ```bash
-            python -m venv cvopt-env
-            ```
-    This creates a folder *cvopt-env* inside your project.
+   - Create a Python environment by running:        
+      ```bash
+      python -m venv cvopt-env
+      ```
+   This creates a folder *cvopt-env* inside your project.
 
-    - Activate the environment:
+   - Activate the environment:
         - **Windows**: `cvopt-env\Scripts\activate`
         - **Mac/Linux**: `source cvopt-env/bin/activate`
 
-    You’ll see *(cvopt-env)* in your terminal — that means it’s active.
+   You’ll see *(cvopt-env)* in your terminal — that means it’s active.
 
 2. **Navigate to Project Directory**  
    Move to the folder where `requirements.txt` is located:
