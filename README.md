@@ -1,6 +1,6 @@
-# Warehouse Management - UnitAI
+# CV Optimizer based on OpenAI
 
-Welcome to the **CV Optimizer** project! This application provides a platform for optimizing CVs for a provided role description.
+Welcome to the **CV Optimizer** project! This application provides a platform for optimizing CVs for a provided role description using OpenAI.
 
 ---
 
