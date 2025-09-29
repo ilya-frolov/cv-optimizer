@@ -1,0 +1,42 @@
+@startuml
+title CV Optimization Process Chain
+
+participant Candidate
+participant UI
+participant CV_Storage
+participant CV_Adapter_Python
+participant OpenAI_API
+participant CV_Formatter
+participant Download_Module
+participant Telegram_Bot
+participant Job_Feed
+
+note over UI : UI can be built with Streamlit or n8n form
+
+== CV Adaptation Initiation ==
+Candidate -> UI : Paste job description
+UI -> CV_Storage : Load original CV (.docx)
+note over CV_Storage : One-time upload stored locally or in cloud
+
+UI -> CV_Adapter_Python : Trigger CV adaptation
+note over CV_Adapter_Python : Prepare prompt and extract CV content
+
+== AI Optimization ==
+CV_Adapter_Python -> OpenAI_API : Send prompt with CV + job description
+OpenAI_API -> CV_Adapter_Python : Return optimized CV text
+
+== CV Reconstruction ==
+CV_Adapter_Python -> CV_Formatter : Rebuild CV in original format
+note over CV_Formatter : Preserve layout, sections, and styling
+
+CV_Formatter -> Download_Module : Prepare final .docx
+Download_Module -> UI : Show download button
+UI -> Candidate : Download adapted CV
+
+== Optional Automation ==
+Job_Feed -> Telegram_Bot : Post filtered job listings
+Candidate -> Telegram_Bot : Click 'Apply'
+Telegram_Bot -> UI : Send job description
+UI -> CV_Adapter_Python : Trigger CV adaptation
+
+@enduml
