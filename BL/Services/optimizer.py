@@ -42,18 +42,4 @@ Tailored Resume:
 def adapt_cv(cv_text: str, job_description: str) -> str:
     prompt = prompt_template(cv_text, job_description)
     raw_output = call_openai(prompt)
-
-    # Remove trailing GPT commentary if present
-    cutoff_phrases = [
-        "This resume was tailored", 
-        "Structured to highlight", 
-        "Optimized for ATS", 
-        "This version emphasizes"
-    ]
-
-    for phrase in cutoff_phrases:
-        if phrase in raw_output:
-            raw_output = raw_output.split(phrase)[0].strip()
-            break
-
     return raw_output

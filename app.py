@@ -2,13 +2,19 @@ import streamlit as st
 import os
 import json
 import io
+import subprocess
+import shutil
+
+from bs4 import BeautifulSoup
 from BL.Services.optimizer import adapt_cv
-from Models.cv_model import extract_cv_text
-from Utils.formatter import text_to_docx
+from Utils.html_tools import docx_to_html_with_styles, html_to_docx
 
 # --- Constants ---
 PATH_STORE = "cv_paths.json"
 TEMP_DIR = "temp"
+OUTPUT_HTML_PATH = os.path.join(TEMP_DIR, "output.html")
+DOCX_OUTPUT_NAME = "optimized_cv.docx"
+DOCX_OUTPUT_PATH = os.path.join(TEMP_DIR, "optimized_cv.docx")
 
 # --- Load stored paths ---
 def load_paths():
@@ -30,10 +36,10 @@ cv_path = None
 
 # --- UI ---
 st.set_page_config(page_title="CV Optimizer with OpenAI", layout="centered")
-st.title("🧠 CV Optimizer")
+st.title("🧠 Format-Preserving CV Optimizer")
 
 # --- File Picker ---
-uploaded_file = st.file_uploader("📂 Open Sample CV (.docx)", type="docx")
+uploaded_file = st.file_uploader("📂 Upload Your CV (.docx)", type="docx")
 
 if uploaded_file:
     temp_path = os.path.join(TEMP_DIR, uploaded_file.name)
@@ -73,22 +79,58 @@ job_description = st.text_area("Paste Job Description", height=200)
 # --- Optimize Button ---
 if st.button("Optimize CV"):
     if cv_path and job_description:
-        cv_text = extract_cv_text(cv_path)
-        optimized_text = adapt_cv(cv_text, job_description)
-        st.subheader("🚀 Optimized CV")
-        st.text_area("Result", optimized_text, height=300)
+        # Step 1: Convert .docx to HTML
+        input_html_path = os.path.join(TEMP_DIR, "input.html")
+        docx_to_html_with_styles(cv_path, input_html_path)
 
-        # --- Download Button ---
-        doc = text_to_docx(optimized_text)
-        buffer = io.BytesIO()
-        doc.save(buffer)
-        st.download_button(
-            label="📥 Download Optimized CV (.docx)",
-            data=buffer.getvalue(),
-            file_name="optimized_cv.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
+        # Show original HTML
+        with open(input_html_path, "r", encoding="utf-8") as f:
+            html = f.read()
 
-        st.text_area("Raw GPT Output", optimized_text, height=300)
+        st.subheader("📄 Original CV Preview")
+        st.components.v1.html(html, height=800, scrolling=True)
+
+        # Step 2: Send raw resume to GPT
+        optimized_text = adapt_cv(html, job_description)
+
+        # Step 3: Inject GPT output into HTML
+        soup = BeautifulSoup(html, "html.parser")
+        target = soup.find("body")
+        if target:
+            target.clear()
+            for line in optimized_text.split("\n"):
+                if line.strip():
+                    tag = soup.new_tag("p")
+                    tag.string = line.strip()
+                    target.append(tag)
+
+        updated_html = str(soup)
+
+        # Step 4: Save HTML to file
+        with open(OUTPUT_HTML_PATH, "w", encoding="utf-8") as f:
+            f.write(updated_html)
+
+
+        # Show updated HTML
+        st.subheader("📄 Updated CV Preview")
+        st.components.v1.html(updated_html, height=800, scrolling=True)
+
+
+        # Step 5: Convert HTML to .docx using Pandoc
+        #pandoc_path = shutil.which("pandoc") or r"C:\Program Files\Pandoc\pandoc.exe"
+        #subprocess.run([pandoc_path, OUTPUT_HTML_PATH, "-o", DOCX_OUTPUT])
+        html_to_docx(OUTPUT_HTML_PATH, DOCX_OUTPUT_PATH)
+
+        # Step 6: Show result and download
+        st.subheader("🚀 Optimized CV Preview")
+        st.text_area("Optimized Text", optimized_text, height=300)
+
+        with open(DOCX_OUTPUT_PATH, "rb") as f:
+            st.download_button(
+                label="📥 Download Optimized CV (.docx)",
+                data=f.read(),
+                file_name=DOCX_OUTPUT_NAME,
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
     else:
         st.warning("Missing CV path or job description.")
