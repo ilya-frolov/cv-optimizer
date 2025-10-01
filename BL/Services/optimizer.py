@@ -1,42 +1,30 @@
 from Clients.openai_client import call_openai
 
 prompt_template = lambda resume_string, jd_string: f"""
-You are a professional resume optimization expert specializing in tailoring resumes to specific job descriptions. Your task is to optimize my resume to match the job description provided.
+You are a professional resume optimization expert. Extract and rewrite only three sections from my resume to align with the provided job description:
+
+1. **SUMMARY** - concise professional profile, goes after the contact information and before any section headers (no section title in source, but output must have "## SUMMARY").
+2. **SKILLS** - extract either 'Core Competencies' or 'Technical Skills', whichever is present. List 6–10 keyword-rich skills.
+3. **EXPERIENCE** — extract 'Professional Experience'. Include **2–4 most relevant roles**, each with **3–5 high-impact, results-focused** bullet points.
 
 ### Guidelines:
-1. Relevance:  
-   - Prioritize experiences, skills, and achievements that are **directly relevant** to the job description.  
+   - Focus on experiences, skills, and achievements **directly relevant** to the job description.  
    - Remove or minimize irrelevant details to keep the resume **concise and targeted**.
-   - Limit the Professional Experience section to the **2–4 most relevant roles**.
-   - Limit bullet points under each role to **3-5 high-impact statements**.
-
-2. Action-Driven Results:  
-   - Use **strong action verbs** and emphasize **quantifiable results** (percentages, savings, efficiency gains, etc.).  
-
-3. Keyword Optimization:  
-   - Integrate **keywords and phrases** from the job description naturally to optimize for ATS (Applicant Tracking Systems).  
-
-4. Formatting:  
-   - Preserve the **structure, tone, and formatting** of my original resume (same sections, order, and style).
-   - Output only the **resume text itself**. Do not include notes, explanations, or additional commentary.
-   - Ensure the final resume does not exceed **two pages**.
-
----
+   - Use **strong action verbs** and emphasize **quantifiable results** (percentages, savings, efficiency gains, etc.) where possible.  
+   - Naturally integrate **keywords and phrases** from the job description for ATS optimization.  
+   - Format as plain text with section headers in ALL CAPS, prefixed with "##".
+   - Use “-” for bullets.
+   - Output must contain exactly these three sections in this order: SUMMARY, SKILLS, EXPERIENCE.
+   - Do not include any other sections (Education, Certifications, etc.).
+   - Keep concise and professional (max two pages).
 
 ### Input:
-- My resume:  
-{resume_string}
-
-- The job description:  
-{jd_string}
-
----
+- My resume: {resume_string}
+- The job description: {jd_string}
 
 ### Output:  
-Tailored Resume:  
-   - A version of my resume in the **same format as the original** but rewritten to emphasize relevance to the job description. 
-   - Uses **concise, action-driven language** with measurable impact where possible.  
-   - Optimized for **ATS** while remaining professional and readable.
+Tailored Resume:
+   - Return the tailored resume in plain text with three optimized sections.
 """
 
 def adapt_cv(cv_text: str, job_description: str) -> str:

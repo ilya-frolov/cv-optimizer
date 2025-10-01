@@ -1,20 +1,21 @@
 import streamlit as st
 import os
 import json
-import io
-import subprocess
-import shutil
 
-from bs4 import BeautifulSoup
 from BL.Services.optimizer import adapt_cv
-from Utils.html_tools import docx_to_html_with_styles, html_to_docx
+from Utils.formatter import parse_gpt_resume
+from Utils.html_tools import (
+    inject_into_template,
+    html_to_docx
+)
 
 # --- Constants ---
 PATH_STORE = "cv_paths.json"
 TEMP_DIR = "temp"
+TEMPLATE_PATH = "templates/cv_template_Scientist.htm"  # Your Word-exported .htm file
 OUTPUT_HTML_PATH = os.path.join(TEMP_DIR, "output.html")
 DOCX_OUTPUT_NAME = "optimized_cv.docx"
-DOCX_OUTPUT_PATH = os.path.join(TEMP_DIR, "optimized_cv.docx")
+DOCX_OUTPUT_PATH = os.path.join(TEMP_DIR, DOCX_OUTPUT_NAME)
 
 # --- Load stored paths ---
 def load_paths():
@@ -76,52 +77,44 @@ if not uploaded_file and not selected_path and last_used:
 # --- Job Description ---
 job_description = st.text_area("Paste Job Description", height=200)
 
-# --- Optimize Button ---
+# --- Optimize CV ---
 if st.button("Optimize CV"):
     if cv_path and job_description:
-        # Step 1: Convert .docx to HTML
-        input_html_path = os.path.join(TEMP_DIR, "input.html")
-        docx_to_html_with_styles(cv_path, input_html_path)
+        # Step 1: Load HTML template
+        if not os.path.exists(TEMPLATE_PATH):
+            st.error("Missing resume_template.htm in templates folder.")
+            st.stop()
 
-        # Show original HTML
-        with open(input_html_path, "r", encoding="utf-8") as f:
-            html = f.read()
+        with open(TEMPLATE_PATH, "r", encoding="utf-8") as f:
+            template_html = f.read()
 
-        st.subheader("📄 Original CV Preview")
-        st.components.v1.html(html, height=800, scrolling=True)
+        st.subheader("📄 Original CV Template Preview")
+        st.components.v1.html(template_html, height=800, scrolling=True)
 
-        # Step 2: Send raw resume to GPT
-        optimized_text = adapt_cv(html, job_description)
+        # Step 2: Send template + job description to GPT
+        optimized_text = adapt_cv(template_html, job_description)
 
-        # Step 3: Inject GPT output into HTML
-        soup = BeautifulSoup(html, "html.parser")
-        target = soup.find("body")
-        if target:
-            target.clear()
-            for line in optimized_text.split("\n"):
-                if line.strip():
-                    tag = soup.new_tag("p")
-                    tag.string = line.strip()
-                    target.append(tag)
+        try:
+            parsed_sections = parse_gpt_resume(optimized_text)
+        except Exception as e:
+            st.error("Failed to parse GPT output. Please check formatting.")
+            st.stop()
 
-        updated_html = str(soup)
+        # Step 3: Inject GPT output into template
+        injected_html = inject_into_template(template_html, parsed_sections, verbose=True)
 
-        # Step 4: Save HTML to file
+        # Step 4: Save updated HTML to file
         with open(OUTPUT_HTML_PATH, "w", encoding="utf-8") as f:
-            f.write(updated_html)
+            f.write(injected_html)
 
-
-        # Show updated HTML
+        # Step 5: Show updated HTML
         st.subheader("📄 Updated CV Preview")
-        st.components.v1.html(updated_html, height=800, scrolling=True)
+        st.components.v1.html(injected_html, height=800, scrolling=True)
 
-
-        # Step 5: Convert HTML to .docx using Pandoc
-        #pandoc_path = shutil.which("pandoc") or r"C:\Program Files\Pandoc\pandoc.exe"
-        #subprocess.run([pandoc_path, OUTPUT_HTML_PATH, "-o", DOCX_OUTPUT])
+        # Step 6: Convert HTML to .docx using Pandoc
         html_to_docx(OUTPUT_HTML_PATH, DOCX_OUTPUT_PATH)
 
-        # Step 6: Show result and download
+        # Step 7: Show result and download
         st.subheader("🚀 Optimized CV Preview")
         st.text_area("Optimized Text", optimized_text, height=300)
 
