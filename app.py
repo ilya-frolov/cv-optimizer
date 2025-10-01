@@ -3,10 +3,10 @@ import os
 import json
 
 from BL.Services.optimizer import adapt_cv
-from Utils.formatter import parse_gpt_resume
+from Utils.formatter import clean_section, parse_gpt_resume
 from Utils.html_tools import (
-    inject_into_template,
-    html_to_docx
+    html_to_docx,
+    inject_sections
 )
 
 # --- Constants ---
@@ -82,7 +82,7 @@ if st.button("Optimize CV"):
     if cv_path and job_description:
         # Step 1: Load HTML template
         if not os.path.exists(TEMPLATE_PATH):
-            st.error("Missing resume_template.htm in templates folder.")
+            st.error("Missing cv_template.htm in templates folder.")
             st.stop()
 
         with open(TEMPLATE_PATH, "r", encoding="utf-8") as f:
@@ -100,8 +100,17 @@ if st.button("Optimize CV"):
             st.error("Failed to parse GPT output. Please check formatting.")
             st.stop()
 
+        # Clean parsed sections: convert lists to strings
+        parsed_sections = {
+            key: clean_section(value)
+            for key, value in parsed_sections.items()
+        }
+
+        # ensure keys are lowercase: 'summary', 'skills', 'experience'
+        parsed_sections = { k.lower(): v for k, v in parsed_sections.items() }
+
         # Step 3: Inject GPT output into template
-        injected_html = inject_into_template(template_html, parsed_sections, verbose=True)
+        injected_html = inject_sections(template_html, parsed_sections, verbose=True)
 
         # Step 4: Save updated HTML to file
         with open(OUTPUT_HTML_PATH, "w", encoding="utf-8") as f:

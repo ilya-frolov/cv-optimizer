@@ -28,3 +28,10 @@ def parse_gpt_resume(text: str) -> dict:
             sections[current].append(line)
 
     return sections
+
+def clean_section(section):
+    if isinstance(section, list):
+        # wrap bullet lines in <li>
+        items = "".join(f"<li>{line.strip()}</li>" for line in section)
+        return f"<ul>{items}</ul>"
+    return f"<p>{section.strip()}</p>"

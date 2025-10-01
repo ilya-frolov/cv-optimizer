@@ -1,6 +1,7 @@
+import re
 import subprocess
 import shutil
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 
 pandoc_path = shutil.which("pandoc") or r"C:\Program Files\Pandoc\pandoc.exe"
 
@@ -129,15 +130,29 @@ def wrap_html(body_content: str, title="Optimized CV") -> str:
 </body>
 </html>"""
 
-def inject_into_template(template_html: str, sections: dict, verbose=False) -> str:
-    for key, content in sections.items():
-        marker = f"<!--{key.upper()}-->"
-        if marker in template_html:
-            injected = f"{marker}\n{content}"
-            template_html = template_html.replace(marker, injected)
+def inject_sections(template_html: str, sections: dict, verbose=False) -> str:
+    """
+    sections: a dict with keys 'summary', 'skills', 'experience', each
+    value is an HTML string (e.g. '<ul><li>…</li></ul>')
+    """
+    soup = BeautifulSoup(template_html, "html.parser")
+
+    for key, html_fragment in sections.items():
+        placeholder = soup.find("div", id=key)
+        if not placeholder:
             if verbose:
-                print(f"✅ Injected section: {key}")
-        else:
-            if verbose:
-                print(f"⚠️ Marker not found: {key}")
-    return template_html
+                print(f"❌ No <div id='{key}'> found.")
+            continue
+
+        # Clear out old children
+        placeholder.clear()
+
+        # Parse the new snippet and append its nodes
+        frag_soup = BeautifulSoup(html_fragment, "html.parser")
+        for node in frag_soup.contents:
+            placeholder.append(node)
+
+        if verbose:
+            print(f"✅ Replaced content in #{key}")
+
+    return str(soup)
