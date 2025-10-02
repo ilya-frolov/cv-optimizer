@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  streamlit-ui:
+    build: ./streamlit-ui
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./templates:/app/templates
+      - ./temp:/app/temp
+    depends_on:
+      - cv-optimizer-api
+      - docx-injector
+
+  cv-optimizer-api:
+    build: ./cv-optimizer-api
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./templates:/app/templates
+      - ./temp:/app/temp
+
+  docx-injector:
+    build: ./docx-injector
+    ports:
+      - "6000:6000"
+    volumes:
+      - ./templates:/app/templates
+      - ./temp:/app/temp
