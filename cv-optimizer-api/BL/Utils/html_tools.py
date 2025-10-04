@@ -17,12 +17,6 @@ def docx_to_html_with_styles(docx_path: str, html_path: str):
     except subprocess.CalledProcessError as e:
         print(f"❌ Pandoc failed to convert DOCX to HTML: {e}")
 
-def html_to_docx(html_path: str, output_path: str):
-    try:
-        subprocess.run([pandoc_path, html_path, "-o", output_path], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Pandoc failed to convert HTML to DOCX: {e}")
-
 def inject_by_data_tag(template_html: str, sections: dict, verbose=False) -> str:
     soup = BeautifulSoup(template_html, "html.parser")
 

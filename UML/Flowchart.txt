@@ -4,9 +4,18 @@ title CV Optimization Process Chain
 participant Candidate
 participant UI
 participant CV_Storage
-participant CV_Adapter_Python
-participant OpenAI_API
-participant CV_Formatter
+
+box "Python Layer" #lightblue
+  participant CV_Adapter_Python
+  participant OpenAI_API
+  participant CV_Orchestrator
+end box
+
+box ".NET Core Layer" #lightgreen
+  participant CV_Injector_NET
+  participant CV_Formatter
+end box
+
 participant Download_Module
 participant Telegram_Bot
 participant Job_Feed
@@ -19,15 +28,20 @@ UI -> CV_Storage : Load original CV (.docx)
 note over CV_Storage : One-time upload stored locally or in cloud
 
 UI -> CV_Adapter_Python : Trigger CV adaptation
-note over CV_Adapter_Python : Prepare prompt and extract CV content
+note over CV_Adapter_Python : Extract CV content and prepare GPT prompt
 
 == AI Optimization ==
 CV_Adapter_Python -> OpenAI_API : Send prompt with CV + job description
 OpenAI_API -> CV_Adapter_Python : Return optimized CV text
 
-== CV Reconstruction ==
-CV_Adapter_Python -> CV_Formatter : Rebuild CV in original format
-note over CV_Formatter : Preserve layout, sections, and styling
+CV_Adapter_Python -> CV_Orchestrator : Save GPT output and POST to injector
+
+== CV Injection ==
+CV_Orchestrator -> CV_Injector_NET : POST optimized text
+note over CV_Injector_NET : Inject into original .docx using bookmarks
+
+CV_Injector_NET -> CV_Formatter : Return formatted .docx
+note over CV_Formatter : Final layout-preserving document
 
 CV_Formatter -> Download_Module : Prepare final .docx
 Download_Module -> UI : Show download button

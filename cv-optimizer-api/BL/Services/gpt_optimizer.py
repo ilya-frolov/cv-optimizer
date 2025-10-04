@@ -4,9 +4,9 @@ prompt_template = lambda resume_string, jd_string: f"""
 You are a professional resume optimization expert. Extract and rewrite only three sections from my resume to align with the provided job description:
 
 1. **SUMMARY** - extract 'Summary'.
-2. **SKILLS** - extract either 'Core Competencies' or 'Technical Skills', whichever is present. List 6–10 keyword-rich skills.
+2. **SKILLS** - extract either 'Core Competencies' or 'Technical Skills', whichever is present.
 3. **EXPERIENCE** – extract 'Professional Experience'. For each role, include:
-   - A header line with the role title, company, and dates (keep as-is)
+   - A header line with the role title, company, , and dates **exactly as in the original resume**
    - 3–5 high-impact bullet points
    - Prefix each role with a tag like "### ROLE1", "### ROLE2", etc.
 
@@ -19,6 +19,7 @@ You are a professional resume optimization expert. Extract and rewrite only thre
    - SUMMARY must be a single paragraph (no bullets).
    - SKILLS: list 6–10 keyword-rich skills with “-”.
    - EXPERIENCE: for each role include 3–5 bullet points using “-”.
+   - Do not modify the role header lines (title, company, dates) — they must remain **verbatim** for downstream injection.
    - Output must contain exactly these three sections in this order: SUMMARY, SKILLS, EXPERIENCE.
    - Do not include any other sections (Education, Certifications, etc.).
 

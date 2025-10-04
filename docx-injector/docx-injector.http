@@ -1,0 +1,6 @@
+@docx_injector_HostAddress = http://localhost:5265
+
+GET {{docx_injector_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,35 +1,22 @@
-﻿using System.Text.Json;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-class Program
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services
+builder.Services.AddControllers(options =>
 {
-    static void Main(string[] args)
-    {
-        string jsonPath = "temp/injection.json";
-        string docxPath = "templates/reference.docx";
-        string outputPath = "temp/optimized_cv.docx";
+    options.InputFormatters.Insert(0, new PlainTextInputFormatter());
+});
 
-        var json = File.ReadAllText(jsonPath);
-        var data = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+var app = builder.Build();
 
-        File.Copy(docxPath, outputPath, true);
+// Configure middleware
+app.UseRouting();
+app.UseAuthorization(); // Optional
 
-        using var doc = WordprocessingDocument.Open(outputPath, true);
-        var body = doc.MainDocumentPart.Document.Body;
+app.MapControllers();
 
-        foreach (var entry in data)
-        {
-            var bookmark = body.Descendants<BookmarkStart>()
-                               .FirstOrDefault(b => b.Name == entry.Key);
-            if (bookmark != null)
-            {
-                var run = new Run(new Text(entry.Value));
-                bookmark.Parent.InsertAfter(run, bookmark);
-            }
-        }
-
-        doc.MainDocumentPart.Document.Save();
-        Console.WriteLine("✅ Injection complete.");
-    }
-}
+Console.WriteLine("✅ ASP.NET is running");
+app.Run();
