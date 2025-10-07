@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("docx-injector")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+97dc16c132869507b99b27ba3f33ca568acbecb4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e17c4027c138dcecee4294169f51dd891b62431b")]
 [assembly: System.Reflection.AssemblyProductAttribute("docx-injector")]
 [assembly: System.Reflection.AssemblyTitleAttribute("docx-injector")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
