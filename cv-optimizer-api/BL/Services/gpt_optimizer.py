@@ -5,12 +5,13 @@ You are a professional resume optimization expert. Extract and rewrite only thre
 
 1. **SUMMARY** - extract and rewrite 'Summary'.
 2. **SKILLS** - extract and rewrite either 'Core Competencies' or 'Technical Skills', whichever is present.
-   - Organize the skills into into 3-6 thematic groups with short headers (e.g., "Machine Learning & AI", "Programming & Frameworks", "Simulation & Visualization", etc.)
-   - Within each group, include 3-6 concise, keyword-rich skills separated by commas
-   - Reflect both technical breadth and research depth, not just single keywords if section is called 'Core Competencies'
+   - Organize the skills into into 3-6 thematic groups with short headers (e.g., "Machine Learning & AI", "Programming & Frameworks", "Simulation & Visualization", etc.).
+   - Do not use any Markdown or formatting symbols (like *, _, or ) — plain text only.
+   - Within each group, include 3-6 concise, keyword-rich skills separated by commas.
+   - Reflect both technical breadth and research depth, not just single keywords if section is called 'Core Competencies'.
 3. **EXPERIENCE** – extract 'Professional Experience'. For each role, include:
-   - A header line with the role title, company, , and dates **exactly as in the original resume**
-   - 3–5 concise, high-impact bullet points emphasizing results, metrics, or technical relevance to the job description
+   - A header line with the role title, company, , and dates **exactly as in the original resume**.
+   - 3–5 concise, high-impact bullet points emphasizing results, metrics, or technical relevance to the job description.
    - Prefix each role with a tag like "### ROLE1", "### ROLE2", etc.
 
 ### Guidelines:
